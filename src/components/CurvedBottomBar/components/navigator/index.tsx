@@ -2,6 +2,7 @@ import React, { useEffect, useImperativeHandle, useMemo, useRef, useState } from
 import { Dimensions, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import Svg, { Path } from 'react-native-svg';
+import {BlurView} from "@react-native-community/blur";
 import { useDeviceOrientation } from '../../../useDeviceOrientation';
 import { getPath, getPathUp } from './path';
 import { styles } from './styles';
@@ -22,6 +23,7 @@ const BottomBarComponent: NavigatorBottomBar = React.forwardRef((props, ref) => 
     height = 65,
     circleWidth = 50,
     bgColor,
+    enableBlur = false,
     initialRouteName,
     tabBar,
     renderCircle,
@@ -128,9 +130,26 @@ const BottomBarComponent: NavigatorBottomBar = React.forwardRef((props, ref) => 
         </PagerView>
 
         <View style={[styles.container, style]}>
-          <Svg width={maxWidth} height={height + (type === 'down' ? 0 : 30)}>
-            <Path fill={bgColor} stroke="#DDDDDD" strokeWidth={strokeWidth} {...{ d }} />
-          </Svg>
+          {enableBlur ? <BlurView
+                style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                }}
+                blurType={forceDark ? 'dark' : 'light'}
+                blurAmount={10}
+                blurRadius={25}
+                overlayColor="transparent">
+                <Svg width={maxWidth} height={height + (type === 'down' ? 0 : 30)}>
+                    <Path fill={bgColor} stroke="#DDDDDD" strokeWidth={strokeWidth} {...{ d }} />
+                </Svg>
+            </BlurView> :
+            <Svg width={maxWidth} height={height + (type === 'down' ? 0 : 30)}>
+                    <Path fill={bgColor} stroke="#DDDDDD" strokeWidth={strokeWidth} {...{ d }} />
+            </Svg>
+          }
+
           <View style={[styles.main, { width: maxWidth }, type === 'up' && { top: 30 }]}>
             <View style={[styles.rowLeft, { height: height }]}>
               {itemLeft.map((item: any, index) => {
